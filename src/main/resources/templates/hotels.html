@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Hotels</title></head>
+<body>
+<h2>Available Hotels</h2>
+<table border="1">
+    <tr><th>Name</th><th>City</th><th>Rating</th><th>Action</th></tr>
+    <tr th:each="hotel : ${hotels}">
+        <td th:text="${hotel.name}"></td>
+        <td th:text="${hotel.city}"></td>
+        <td th:text="${hotel.rating}"></td>
+        <td><a th:href="@{/book/{id}(id=${hotel.id})}">Book</a></td>
+    </tr>
+</table>
+</body>
+</html>

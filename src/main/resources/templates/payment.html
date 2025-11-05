@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payment</title>
+</head>
+<body>
+<h2>Payment Page</h2>
+<p>Booking ID: <span th:text="${booking.id}"></span></p>
+<p>Total Amount: ₹<span th:text="${booking.amount}"></span></p>
+<form th:action="@{/payment/confirm}" method="post">
+    <label>Card Number:</label>
+    <input type="text" name="cardNumber" required><br>
+    <button type="submit">Pay Now</button>
+</form>
+</body>
+</html>
