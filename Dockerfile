@@ -1,5 +1,5 @@
-# Build stage - Use JDK 17
-FROM maven:3.8.6-openjdk-17 AS build
+# Build stage
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
 # Copy pom.xml and download dependencies
@@ -10,14 +10,14 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Run stage - Use JDK 17  
-FROM openjdk:17-jdk-slim
+# Run stage
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
-# Copy the built JAR from build stage
+# Copy the built JAR
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose port (Render uses 10000)
+# Expose Render port
 EXPOSE 10000
 
 # Run the application
