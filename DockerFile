@@ -2,7 +2,7 @@
 # Run this project with java 21
 
 # Use a lightweight OpenJDK image
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 # ---------- Stage 1: Build ----------
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # ---------- Stage 2: Run ----------
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 WORKDIR /app
 
 # Copy the built JAR from target folder to the container
