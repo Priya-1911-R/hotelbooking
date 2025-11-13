@@ -1,11 +1,235 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel Booking System</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hotel-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .hero-container h1 {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .hero-container .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+        }
+
+        /* User Welcome Styles */
+        .user-welcome {
+            background: rgba(0, 188, 212, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #00bcd4;
+        }
+
+        .user-welcome h3 {
+            color: #007c91;
+            margin-bottom: 0.5rem;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #00bcd4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0097a7;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #00bcd4;
+            border: 2px solid #00bcd4;
+        }
+
+        .btn-secondary:hover {
+            background: #00bcd4;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .features {
+            margin-top: 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .feature-text {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .hero-container {
+                padding: 2rem 1.5rem;
+            }
+            .hero-container h1 {
+                font-size: 1.8rem;
+            }
+            .button-container {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h2>Welcome to Hotel Booking System</h2>
-<a href="/login">Login</a> | <a href="/register">Register</a> | <a href="/hotels">View Hotels</a>
+    <div class="hero-container">
+        <span class="hotel-icon">🏨</span>
+        
+        <!-- FOR LOGGED-IN USERS -->
+        <div th:if="${isAuthenticated}">
+            <div class="user-welcome">
+                <h3>Welcome back, <span th:text="${username}">User</span>! 👋</h3>
+                <p>Ready to book your next adventure?</p>
+            </div>
+            
+            <h1>Explore Amazing Hotels</h1>
+            <p class="subtitle">Discover your perfect stay with exclusive member benefits</p>
+            
+            <div class="button-container">
+                <a th:href="@{/hotels}" class="btn btn-success">Browse Hotels</a>
+                <a th:href="@{/dashboard}" class="btn btn-primary">My Dashboard</a>
+                <a th:href="@{/logout}" class="btn btn-logout">Logout</a>
+            </div>
+        </div>
+        
+        <!-- FOR GUESTS (Not logged in) -->
+        <div th:unless="${isAuthenticated}">
+            <h1>Welcome to Hotel Booking System</h1>
+            <p class="subtitle">Find your perfect stay with our exclusive deals and premium accommodations</p>
+            
+            <div class="button-container">
+                <a th:href="@{/login}" class="btn btn-primary">Login</a>
+                <a th:href="@{/register}" class="btn btn-secondary">Register</a>
+            </div>
+        </div>
+        
+        <!-- Features (shown to everyone) -->
+        <div class="features">
+            <div class="feature-item">
+                <span class="feature-icon">⭐</span>
+                <div class="feature-text">Premium Quality</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">💰</span>
+                <div class="feature-text">Best Prices</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🔒</span>
+                <div class="feature-text">Secure Booking</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        &copy; 2024 Hotel Booking System. All rights reserved.
+    </div>
 </body>
 </html>

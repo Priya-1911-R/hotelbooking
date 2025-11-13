@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation | Hotel Booking</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+        body { min-height: 100vh; background: linear-gradient(135deg, #4facfe, #00f2fe); display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .confirmation-container { background: #fff; padding: 3rem; border-radius: 1rem; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); text-align: center; max-width: 600px; width: 100%; }
+        .success-icon { font-size: 4rem; color: #4CAF50; margin-bottom: 1rem; }
+        .error-message { color: #f44336; margin: 1rem 0; padding: 1rem; background: #ffebee; border-radius: 0.5rem; border-left: 4px solid #f44336; }
+    </style>
+</head>
+<body>
+    <div class="confirmation-container">
+        <div class="success-icon">✅</div>
+        <h1>Booking Confirmation Test</h1>
+        
+        <!-- Debug Info -->
+        <div style="background: #e3f2fd; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; text-align: left;">
+            <h3>Debug Information:</h3>
+            <p>Booking Object: <span th:text="${booking != null ? 'EXISTS' : 'NULL'}">UNKNOWN</span></p>
+            <p th:if="${booking != null}">Booking ID: <span th:text="${booking.id}">N/A</span></p>
+        </div>
+
+        <!-- Show error if no booking -->
+        <div th:if="${booking == null}" class="error-message">
+            <strong>Booking Not Found</strong>
+            <p>We couldn't find your booking details.</p>
+            <p>Error: <span th:text="${error}">No error message</span></p>
+        </div>
+
+        <!-- Show confirmation if booking exists -->
+        <div th:if="${booking != null}">
+            <h1>Booking Confirmed!</h1>
+            <p>Your booking has been confirmed successfully!</p>
+            
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 0.75rem; margin: 1.5rem 0; text-align: left;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #666;">Booking ID:</span>
+                    <span style="font-weight: 600; color: #333;" th:text="${booking.id}">123</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid #e9ecef;">
+                    <span style="font-weight: 500; color: #666;">Hotel Name:</span>
+                    <span style="font-weight: 600; color: #333;" th:text="${booking.hotelName != null ? booking.hotelName : 'Not specified'}">Hotel</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <a href="/" style="display: inline-block; padding: 12px 30px; background: #00bcd4; color: white; text-decoration: none; border-radius: 0.5rem;">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- Show any system errors -->
+        <div th:if="${error}" class="error-message">
+            <strong>System Error:</strong>
+            <div th:text="${error}"></div>
+        </div>
+    </div>
+</body>
+</html>

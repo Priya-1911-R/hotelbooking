@@ -1,13 +1,430 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Register</title></head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - HotelBooking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .left-panel h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .left-panel p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .features i {
+            margin-right: 10px;
+            color: #4ade80;
+            font-size: 1.1rem;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            z-index: 2;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e5e7eb;
+            z-index: 1;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .social-btn {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .social-btn.google {
+            color: #db4437;
+        }
+
+        .social-btn.facebook {
+            color: #4267B2;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 30px;
+            color: #6b7280;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 450px;
+            }
+            
+            .left-panel {
+                padding: 30px;
+                text-align: center;
+            }
+            
+            .right-panel {
+                padding: 30px;
+            }
+            
+            .social-login {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .right-panel > * {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .form-group {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .btn { animation-delay: 0.5s; }
+        .login-link { animation-delay: 0.6s; }
+    </style>
+</head>
 <body>
-<h2>User Registration</h2>
-<form th:action="@{/register}" method="post">
-    <input type="text" name="username" placeholder="Username" required><br>
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
-    <button type="submit">Register</button>
-</form>
+    <div class="container">
+        <!-- Left Panel - Branding -->
+        <div class="left-panel">
+            <div class="logo">
+                <i class="fas fa-hotel"></i>
+                HotelBooking
+            </div>
+            <h1>Join Our Community</h1>
+            <p>Create your account and start exploring the best hotels around the world. Enjoy exclusive deals and personalized experiences.</p>
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> Best price guarantee</li>
+                <li><i class="fas fa-check-circle"></i> Free cancellation</li>
+                <li><i class="fas fa-check-circle"></i> 24/7 customer support</li>
+                <li><i class="fas fa-check-circle"></i> Instant confirmation</li>
+            </ul>
+        </div>
+
+        <!-- Right Panel - Registration Form -->
+        <div class="right-panel">
+            <div class="form-header">
+                <h2>Create Account</h2>
+                <p>Join thousands of happy travelers</p>
+            </div>
+
+            <form action="/register" method="post">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-at"></i>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>Or continue with</span>
+            </div>
+
+            <div class="social-login">
+                <button type="button" class="social-btn google">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button type="button" class="social-btn facebook">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </button>
+            </div>
+
+            <div class="login-link">
+                Already have an account? <a th:href="@{/login}">Sign in here</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.form-control');
+            
+            inputs.forEach(input => {
+                // Add focus effects
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (this.value === '') {
+                        this.parentElement.classList.remove('focused');
+                    }
+                });
+            });
+
+            // Add loading state to submit button
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('.btn');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                btn.disabled = true;
+            });
+        });
+    </script>
 </body>
 </html>

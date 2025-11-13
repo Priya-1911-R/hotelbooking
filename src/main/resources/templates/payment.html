@@ -1,16 +1,573 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Payment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Hotel Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .payment-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .payment-header h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .payment-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .booking-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #00bcd4;
+        }
+
+        .summary-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .summary-details {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.25rem 0;
+        }
+
+        .detail-label {
+            color: #666;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .total-amount {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #00bcd4;
+            border-top: 1px solid #e1e5e9;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00bcd4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+        }
+
+        /* Error states */
+        .form-group.error input, 
+        .form-group.error select {
+            border-color: #f44336;
+            box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .card-inputs {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .pay-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00bcd4, #0097a7);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .pay-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 188, 212, 0.3);
+        }
+
+        .pay-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .field-error {
+            color: #f44336;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .success-checkmark {
+            color: #4CAF50;
+            font-size: 1.2rem;
+        }
+
+        .error-cross {
+            color: #f44336;
+            font-size: 1.2rem;
+        }
+    </style>
 </head>
 <body>
-<h2>Payment Page</h2>
-<p>Booking ID: <span th:text="${booking.id}"></span></p>
-<p>Total Amount: ₹<span th:text="${booking.amount}"></span></p>
-<form th:action="@{/payment/confirm}" method="post">
-    <label>Card Number:</label>
-    <input type="text" name="cardNumber" required><br>
-    <button type="submit">Pay Now</button>
-</form>
+    <div class="payment-container">
+        <!-- Back Button -->
+        <button type="button" class="back-btn" onclick="window.history.back()">
+            ← Back to Booking
+        </button>
+
+        <!-- Header -->
+        <div class="payment-header">
+            <span class="payment-icon">💳</span>
+            <h2>Complete Payment</h2>
+            <p class="payment-subtitle">Secure payment processing</p>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${param.success}" class="alert alert-success">
+            <span class="success-checkmark">✅</span>
+            Booking created successfully! Please complete your payment.
+        </div>
+
+        <!-- Server-side error messages -->
+        <div th:if="${error}" class="alert alert-error">
+            <span class="error-cross">❌</span>
+            <span th:text="${error}">Error message here</span>
+        </div>
+
+        <!-- Show error if booking not found -->
+        <div th:if="${bookingId == null}" class="alert alert-error">
+            <span class="error-cross">❌</span>
+            No booking found. Please go back and create a booking first.
+        </div>
+
+        <!-- Booking Summary - Only show if booking exists -->
+        <div th:if="${bookingId != null}" class="booking-summary">
+            <div class="summary-title">Booking Summary</div>
+            <div class="summary-details">
+                <div class="detail-row">
+                    <span class="detail-label">Booking ID:</span>
+                    <span class="detail-value" th:text="${bookingId}">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount:</span>
+                    <span class="detail-value">$<span th:text="${#numbers.formatDecimal(amount != null ? amount : 0, 1, 2)}">0.00</span></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Check-in:</span>
+                    <span class="detail-value" th:text="${checkInDate != null ? checkInDate : 'N/A'}">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Check-out:</span>
+                    <span class="detail-value" th:text="${checkOutDate != null ? checkOutDate : 'N/A'}">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Guests:</span>
+                    <span class="detail-value" th:text="${guests != null ? guests : 'N/A'}">--</span>
+                </div>
+                <div class="detail-row total-amount">
+                    <span>Total to Pay:</span>
+                    <span>$<span th:text="${#numbers.formatDecimal(amount != null ? amount : 0, 1, 2)}">0.00</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Form - Only show if booking exists -->
+        <form th:if="${bookingId != null}" th:action="@{/payment/confirm}" method="post" id="paymentForm">
+            <!-- CSRF Token -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" name="bookingId" th:value="${bookingId}">
+            
+            <div class="form-group" id="paymentMethodGroup">
+                <label for="paymentMethod">Payment Method</label>
+                <select id="paymentMethod" name="paymentMethod" required>
+                    <option value="">Select payment method</option>
+                    <option value="CREDIT_CARD">Credit Card</option>
+                    <option value="DEBIT_CARD">Debit Card</option>
+                    <option value="PAYPAL">PayPal</option>
+                </select>
+                <div class="error-message" id="paymentMethodError" style="display: none;">
+                    ❌ Please select a payment method
+                </div>
+            </div>
+
+            <div class="form-group" id="cardHolderGroup">
+                <label for="cardHolder">Cardholder Name</label>
+                <input type="text" id="cardHolder" name="cardHolder" placeholder="John Doe" required>
+                <div class="error-message" id="cardHolderError" style="display: none;">
+                    ❌ Please enter cardholder name
+                </div>
+            </div>
+
+            <div class="form-group" id="cardNumberGroup">
+                <label for="cardNumber">Card Number</label>
+                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" required>
+                <div class="error-message" id="cardNumberError" style="display: none;">
+                    ❌ Please enter a valid 16-digit card number
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Card Details</label>
+                <div class="card-inputs">
+                    <div id="expiryDateGroup">
+                        <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" required>
+                        <div class="error-message" id="expiryDateError" style="display: none;">
+                            ❌ Invalid expiry date (MM/YY)
+                        </div>
+                    </div>
+                    <div id="cvvGroup">
+                        <input type="text" id="cvv" name="cvv" placeholder="CVV" required>
+                        <div class="error-message" id="cvvError" style="display: none;">
+                            ❌ Invalid CVV (3 digits)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="pay-btn" id="submitBtn">
+                <span class="btn-icon">💰</span>
+                Pay Now
+            </button>
+        </form>
+
+        <!-- Show message if no booking -->
+        <div th:if="${bookingId == null}" class="alert alert-info">
+            <span>💡</span>
+            No booking found. <a th:href="@{/booking/list}">View your bookings</a> or 
+            <a th:href="@{/}">book a hotel</a> first.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentForm = document.getElementById('paymentForm');
+            if (!paymentForm) return; // Exit if no form (booking not found)
+            
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Get form groups for error handling
+            const paymentMethodGroup = document.getElementById('paymentMethodGroup');
+            const cardHolderGroup = document.getElementById('cardHolderGroup');
+            const cardNumberGroup = document.getElementById('cardNumberGroup');
+            const expiryDateGroup = document.getElementById('expiryDateGroup');
+            const cvvGroup = document.getElementById('cvvGroup');
+
+            // Format card number input
+            const cardNumberInput = document.getElementById('cardNumber');
+            cardNumberInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let matches = value.match(/\d{4,16}/g);
+                let match = matches && matches[0] || '';
+                let parts = [];
+                
+                for (let i = 0; i < match.length; i += 4) {
+                    parts.push(match.substring(i, i + 4));
+                }
+                
+                if (parts.length) {
+                    e.target.value = parts.join(' ');
+                } else {
+                    e.target.value = value;
+                }
+                
+                validateCardNumber();
+            });
+
+            // Format expiry date input
+            const expiryInput = document.getElementById('expiryDate');
+            expiryInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                validateExpiryDate();
+            });
+
+            // Only allow numbers for CVV
+            const cvvInput = document.getElementById('cvv');
+            cvvInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+                validateCVV();
+            });
+
+            // Real-time validation
+            document.getElementById('paymentMethod').addEventListener('change', validatePaymentMethod);
+            document.getElementById('cardHolder').addEventListener('input', validateCardHolder);
+
+            // Validation functions
+            function validatePaymentMethod() {
+                const paymentMethod = document.getElementById('paymentMethod').value;
+                const errorElement = document.getElementById('paymentMethodError');
+                
+                if (!paymentMethod) {
+                    paymentMethodGroup.classList.add('error');
+                    errorElement.style.display = 'flex';
+                    return false;
+                } else {
+                    paymentMethodGroup.classList.remove('error');
+                    errorElement.style.display = 'none';
+                    return true;
+                }
+            }
+
+            function validateCardHolder() {
+                const cardHolder = document.getElementById('cardHolder').value.trim();
+                const errorElement = document.getElementById('cardHolderError');
+                
+                if (!cardHolder) {
+                    cardHolderGroup.classList.add('error');
+                    errorElement.style.display = 'flex';
+                    return false;
+                } else {
+                    cardHolderGroup.classList.remove('error');
+                    errorElement.style.display = 'none';
+                    return true;
+                }
+            }
+
+            function validateCardNumber() {
+                const cardNumber = cardNumberInput.value.replace(/\s/g, '');
+                const errorElement = document.getElementById('cardNumberError');
+                
+                if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
+                    cardNumberGroup.classList.add('error');
+                    errorElement.style.display = 'flex';
+                    return false;
+                } else {
+                    cardNumberGroup.classList.remove('error');
+                    errorElement.style.display = 'none';
+                    return true;
+                }
+            }
+
+            function validateExpiryDate() {
+                const expiryDate = expiryInput.value;
+                const errorElement = document.getElementById('expiryDateError');
+                const regex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
+                
+                if (!regex.test(expiryDate)) {
+                    expiryDateGroup.classList.add('error');
+                    errorElement.style.display = 'flex';
+                    return false;
+                } else {
+                    expiryDateGroup.classList.remove('error');
+                    errorElement.style.display = 'none';
+                    return true;
+                }
+            }
+
+            function validateCVV() {
+                const cvv = cvvInput.value;
+                const errorElement = document.getElementById('cvvError');
+                
+                if (cvv.length !== 3 || !/^\d+$/.test(cvv)) {
+                    cvvGroup.classList.add('error');
+                    errorElement.style.display = 'flex';
+                    return false;
+                } else {
+                    cvvGroup.classList.remove('error');
+                    errorElement.style.display = 'none';
+                    return true;
+                }
+            }
+
+            // Form submission
+            paymentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all fields
+                const isPaymentMethodValid = validatePaymentMethod();
+                const isCardHolderValid = validateCardHolder();
+                const isCardNumberValid = validateCardNumber();
+                const isExpiryDateValid = validateExpiryDate();
+                const isCVVValid = validateCVV();
+                
+                const isValid = isPaymentMethodValid && isCardHolderValid && 
+                              isCardNumberValid && isExpiryDateValid && isCVVValid;
+                
+                if (isValid) {
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="btn-icon">⏳</span> Processing Payment...';
+                    
+                    // Submit the form after a brief delay to show loading state
+                    setTimeout(() => {
+                        paymentForm.submit();
+                    }, 500);
+                } else {
+                    // Scroll to first error
+                    const firstError = document.querySelector('.error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    
+                    // Show general error message
+                    const existingAlert = document.querySelector('.alert-error.general');
+                    if (!existingAlert) {
+                        const errorAlert = document.createElement('div');
+                        errorAlert.className = 'alert alert-error general';
+                        errorAlert.innerHTML = '<span class="error-cross">❌</span> Please fix the errors above before submitting.';
+                        paymentForm.parentNode.insertBefore(errorAlert, paymentForm);
+                        
+                        // Remove after 5 seconds
+                        setTimeout(() => {
+                            errorAlert.remove();
+                        }, 5000);
+                    }
+                }
+            });
+
+            // Clear general errors when user starts typing
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const generalError = document.querySelector('.alert-error.general');
+                    if (generalError) {
+                        generalError.remove();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

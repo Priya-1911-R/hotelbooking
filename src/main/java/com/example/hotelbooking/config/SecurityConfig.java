@@ -1,53 +1,98 @@
 package com.example.hotelbooking.config;
 
-import com.example.hotelbooking.security.CustomUserDetailsService;
-import com.example.hotelbooking.security.JwtAuthenticationFilter;
-import com.example.hotelbooking.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.*;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.*;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.example.hotelbooking.repository.UserRepository;
 
 @Configuration
-@EnableMethodSecurity
+@EnableWebSecurity
 public class SecurityConfig {
-    private final CustomUserDetailsService userDetailsService;
-    private final JwtUtil jwtUtil;
 
-    public SecurityConfig(CustomUserDetailsService uds, JwtUtil jwtUtil) {
-        this.userDetailsService = uds;
-        this.jwtUtil = jwtUtil;
+    private final UserRepository userRepository;
+
+    public SecurityConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        var jwtFilter = new JwtAuthenticationFilter(jwtUtil, userDetailsService);
-
-        http.csrf().disable()
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**", "/h2-console/**", "/api/hotels", "/api/hotels/search").permitAll()
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                    .anyRequest().authenticated()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(authz -> authz
+                // Public routes
+                .requestMatchers(
+                    "/", "/home", "/css/**", "/js/**", "/images/**",
+                    "/login", "/register", "/test/**", "/h2-console/**",
+                    "/debug", "/no-auth-test", "/error",
+                    "/booking/health-check", "/booking/test", "/booking/debug"
+                ).permitAll()
+                
+                // User routes (both USER and ADMIN)
+                .requestMatchers(
+                    "/dashboard", 
+                    "/booking/**", 
+                    "/payment/**",
+                    "/my-bookings"
+                ).hasAnyRole("USER", "ADMIN")
+                
+                // Admin-only routes
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                
+                // Everything else requires authentication
+                .anyRequest().authenticated()
             )
-            .sessionManagement(s -> s.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+            )
+            .exceptionHandling(ex -> ex
+                .accessDeniedPage("/access-denied")
+            );
 
-        // allow H2 console frames (if used)
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
         return http.build();
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> userRepository.findByUsernameOrEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
 }

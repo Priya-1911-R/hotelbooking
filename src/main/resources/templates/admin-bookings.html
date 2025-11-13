@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Bookings - Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f8f9fa; color: #333; }
+        .navbar { background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; }
+        .btn { padding: 0.5rem 1rem; margin: 2px; text-decoration: none; border-radius: 5px; display: inline-block; border: none; cursor: pointer; font-size: 0.9rem; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-danger { background: #dc3545; color: white; }
+        .status-pending { color: #ffc107; font-weight: 600; }
+        .status-confirmed { color: #28a745; font-weight: 600; }
+        .status-cancelled { color: #dc3545; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1><i class="fas fa-calendar"></i> Manage Bookings</h1>
+        <div>
+            <a href="/admin/dashboard" class="btn" style="background: #6c757d; color: white;">Back to Dashboard</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Bookings</h3>
+                <p style="font-size: 2rem; color: #007bff;" th:text="${stats.totalBookings}">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Pending</h3>
+                <p style="font-size: 2rem; color: #ffc107;" th:text="${stats.pendingBookings}">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Confirmed</h3>
+                <p style="font-size: 2rem; color: #28a745;" th:text="${stats.confirmedBookings}">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Cancelled</h3>
+                <p style="font-size: 2rem; color: #dc3545;" th:text="${stats.cancelledBookings}">0</p>
+            </div>
+        </div>
+
+        <!-- Bookings Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Hotel</th>
+                    <th>User</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="booking : ${bookings}">
+                    <td th:text="${booking.id}">1</td>
+                    <td th:text="${booking.hotelName}">Hotel Name</td>
+                    <td th:text="${booking.username}">user123</td>
+                    <td th:text="${#temporals.format(booking.checkInDate, 'MMM dd, yyyy')}">Jan 01, 2024</td>
+                    <td th:text="${#temporals.format(booking.checkOutDate, 'MMM dd, yyyy')}">Jan 05, 2024</td>
+                    <td th:text="'$' + ${booking.totalPrice}">$500.00</td>
+                    <td>
+                        <span th:class="'status-' + ${booking.status.toString().toLowerCase()}" 
+                              th:text="${booking.status}">PENDING</span>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/updateBookingStatus}" method="post" style="display: inline;">
+                            <input type="hidden" name="bookingId" th:value="${booking.id}">
+                            <button type="submit" name="status" value="CONFIRMED" class="btn btn-success">Confirm</button>
+                            <button type="submit" name="status" value="CANCELLED" class="btn btn-danger">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,48 +1,61 @@
 package com.example.hotelbooking.controller;
 
-import com.example.hotelbooking.dto.*;
-import com.example.hotelbooking.model.User;
-import com.example.hotelbooking.security.JwtUtil;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.hotelbooking.dto.RegisterRequest;
 import com.example.hotelbooking.service.UserService;
-import com.example.hotelbooking.security.CustomUserDetailsService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/auth")
+@Controller
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
-    private final UserService userService;
-    private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService uds;
 
-    public AuthController(AuthenticationManager am, UserService us, JwtUtil ju, CustomUserDetailsService uds) {
-        this.authenticationManager = am;
-        this.userService = us;
-        this.jwtUtil = ju;
-        this.uds = uds;
+    private final UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-        User u = userService.register(req);
-        return ResponseEntity.ok(u);
+    public String registerUser(@RequestParam String name,
+                              @RequestParam String email,
+                              @RequestParam String username,
+                              @RequestParam String password,
+                              RedirectAttributes redirectAttributes) {
+        
+        try {
+            RegisterRequest request = new RegisterRequest(name, email, username, password, "USER");
+            userService.registerUser(request);
+            redirectAttributes.addFlashAttribute("success", "Registration successful! Please login.");
+            return "redirect:/login";
+            
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("name", name);
+            redirectAttributes.addFlashAttribute("email", email);
+            redirectAttributes.addFlashAttribute("username", username);
+            return "redirect:/register";
+        }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest req) {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+    @GetMapping("/login")
+    public String loginPage(@RequestParam(value = "error", required = false) String error,
+                           @RequestParam(value = "logout", required = false) String logout,
+                           Model model) {
+        if (error != null) {
+            model.addAttribute("error", "Invalid username or password. Please try again.");
         }
-        UserDetails ud = uds.loadUserByUsername(req.getUsername());
-        // retrieve role from user service (or user repo)
-        var userOpt = userService.findByUsername(req.getUsername());
-        String role = userOpt.map(u -> u.getRole().name()).orElse("USER");
-        String token = jwtUtil.generateToken(req.getUsername(), role);
-        return ResponseEntity.ok(new AuthResponse(token));
+        if (logout != null) {
+            model.addAttribute("message", "You have been logged out successfully.");
+        }
+        return "login";
+    }
+
+    @GetMapping("/register")
+    public String registerPage(Model model) {
+        return "register";
     }
 }

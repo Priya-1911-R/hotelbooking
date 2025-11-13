@@ -1,16 +1,425 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><title>Hotels</title></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Amazing Hotels</title>
+    <style>
+        /* Your existing CSS remains the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .search-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin: -2rem auto 2rem;
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+        }
+        
+        .search-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .filter-group input, .filter-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            align-self: flex-end;
+        }
+        
+        .search-btn:hover {
+            background: #2980b9;
+        }
+        
+        .hotels-section {
+            padding: 2rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2c3e50;
+        }
+        
+        .hotels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .hotel-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .hotel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .hotel-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .hotel-info {
+            padding: 1.5rem;
+        }
+        
+        .hotel-name {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .hotel-location {
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .hotel-location i {
+            margin-right: 0.5rem;
+        }
+        
+        .hotel-features {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .hotel-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        
+        .book-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .book-btn:hover {
+            background: #c0392b;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #2ecc71;
+        }
+        
+        .notification.error {
+            background: #e74c3c;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
 <body>
-<h2>Available Hotels</h2>
-<table border="1">
-    <tr><th>Name</th><th>City</th><th>Rating</th><th>Action</th></tr>
-    <tr th:each="hotel : ${hotels}">
-        <td th:text="${hotel.name}"></td>
-        <td th:text="${hotel.city}"></td>
-        <td th:text="${hotel.rating}"></td>
-        <td><a th:href="@{/book/{id}(id=${hotel.id})}">Book</a></td>
-    </tr>
-</table>
+    <header>
+        <div class="container">
+            <h1>Discover Amazing Hotels</h1>
+            <p>Find your perfect stay with our exclusive collection</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <section class="search-section">
+            <h2>Search & Filters</h2>
+            <div class="search-filters">
+                <div class="filter-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="Enter destination" value="New York">
+                </div>
+                <div class="filter-group">
+                    <label for="checkin">Check-in</label>
+                    <input type="date" id="checkin" value="2025-08-11">
+                </div>
+                <div class="filter-group">
+                    <label for="checkout">Check-out</label>
+                    <input type="date" id="checkout" value="2025-09-11">
+                </div>
+                <div class="filter-group">
+                    <label for="guests">Guests</label>
+                    <select id="guests">
+                        <option value="1">1 Guest</option>
+                        <option value="2" selected>2 Guests</option>
+                        <option value="3">3 Guests</option>
+                        <option value="4">4 Guests</option>
+                        <option value="5">5+ Guests</option>
+                    </select>
+                </div>
+                <button class="search-btn" id="searchHotels">Search Hotels</button>
+            </div>
+        </section>
+        
+        <section class="hotels-section">
+            <h2 class="section-title">Featured Hotels</h2>
+            <div class="hotels-grid" id="hotelsGrid">
+                <!-- Hotel cards will be populated by JavaScript -->
+            </div>
+        </section>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Hotel Booking. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Sample hotel data - This will be replaced by Thymeleaf data
+        const hotels = [
+            {
+                id: 1,
+                name: "Grand Plaza Hotel",
+                location: "New York, NY",
+                image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                price: 249,
+                rating: 4.5,
+                features: ["Free WiFi", "Pool", "Spa"]
+            },
+            {
+                id: 2,
+                name: "Luxury Suites Central",
+                location: "New York, NY",
+                image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                price: 349,
+                rating: 4.8,
+                features: ["Breakfast Included", "Gym", "Bar"]
+            },
+            {
+                id: 3,
+                name: "Riverside Inn",
+                location: "New York, NY",
+                image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                price: 199,
+                rating: 4.2,
+                features: ["Free Parking", "Restaurant", "Pet Friendly"]
+            },
+            {
+                id: 4,
+                name: "Metropolitan Tower",
+                location: "New York, NY",
+                image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                price: 299,
+                rating: 4.6,
+                features: ["City View", "Concierge", "Business Center"]
+            }
+        ];
+        
+        // DOM elements
+        const hotelsGrid = document.getElementById('hotelsGrid');
+        const searchBtn = document.getElementById('searchHotels');
+        const notification = document.getElementById('notification');
+        
+        // Function to display hotels
+        function displayHotels(hotelsArray) {
+            hotelsGrid.innerHTML = '';
+            
+            if (hotelsArray.length === 0) {
+                hotelsGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 2rem;">No hotels found matching your criteria.</p>';
+                return;
+            }
+            
+            hotelsArray.forEach(hotel => {
+                const hotelCard = document.createElement('div');
+                hotelCard.className = 'hotel-card';
+                
+                hotelCard.innerHTML = `
+    <img src="${hotel.image}" alt="${hotel.name}" class="hotel-image">
+    <div class="hotel-info">
+        <h3 class="hotel-name">${hotel.name}</h3>
+        <div class="hotel-location">
+            <i>📍</i> ${hotel.location}
+        </div>
+        <div class="hotel-features">
+            <span>⭐ ${hotel.rating}/5</span>
+            <span>${hotel.features.join(' • ')}</span>
+        </div>
+        <div class="hotel-price">$${hotel.price}/night</div>
+        <a href="/booking/book?hotelId=${hotel.id}&hotelName=${encodeURIComponent(hotel.name)}&pricePerNight=${hotel.price}" 
+           class="book-btn">Book Now</a>
+    </div>
+`;
+                
+                hotelsGrid.appendChild(hotelCard);
+            });
+        }
+        
+        // Function to handle hotel search
+        function searchHotels() {
+            const location = document.getElementById('location').value;
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            const guests = document.getElementById('guests').value;
+            
+            // Simple validation
+            if (!location) {
+                showNotification('Please enter a location', 'error');
+                return;
+            }
+            
+            if (!checkin || !checkout) {
+                showNotification('Please select check-in and check-out dates', 'error');
+                return;
+            }
+            
+            // In a real app, this would be an API call
+            // For this demo, we'll just filter by location
+            const filteredHotels = hotels.filter(hotel => 
+                hotel.location.toLowerCase().includes(location.toLowerCase())
+            );
+            
+            displayHotels(filteredHotels);
+            
+            if (filteredHotels.length > 0) {
+                showNotification(`Found ${filteredHotels.length} hotels in ${location}`, 'success');
+            } else {
+                showNotification(`No hotels found in ${location}. Try a different location.`, 'error');
+            }
+        }
+        
+        // Function to show notifications
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display all hotels initially
+            displayHotels(hotels);
+            
+            // Add event listener to search button
+            searchBtn.addEventListener('click', searchHotels);
+            
+            // Add event listener to Enter key in location field
+            document.getElementById('location').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchHotels();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

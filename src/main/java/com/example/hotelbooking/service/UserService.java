@@ -1,43 +1,53 @@
 package com.example.hotelbooking.service;
 
-import java.util.Optional;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.hotelbooking.dto.RegisterRequest;
-import com.example.hotelbooking.model.Role;
 import com.example.hotelbooking.model.User;
 import com.example.hotelbooking.repository.UserRepository;
 
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository ur, PasswordEncoder pe) {
-        this.userRepository = ur;
-        this.passwordEncoder = pe;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public User register(RegisterRequest req) {
-        if (userRepository.existsByUsername(req.getUsername())) {
+    public User registerUser(RegisterRequest request) {
+        // Check if username already exists
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
-        if (userRepository.existsByEmail(req.getEmail())) {
+
+        // Check if email already exists
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
-        User u = new User();
-        u.setUsername(req.getUsername());
-        u.setEmail(req.getEmail());
-        u.setPassword(passwordEncoder.encode(req.getPassword()));
-        u.setRole(Role.USER);
-        return userRepository.save(u);
+
+        // Create new user
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole() != null ? request.getRole() : "USER");
+        user.setEnabled(true); // ADD THIS CRITICAL LINE
+
+        return userRepository.save(user);
     }
 
-    public Optional<User> findByUsername(String username) {
-    return userRepository.findByUsername(username);
-}
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
-    
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }

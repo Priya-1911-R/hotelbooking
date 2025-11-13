@@ -1,12 +1,684 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Admin Dashboard</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - HotelBooking</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --success-dark: #219a52;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --danger-dark: #c0392b;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
+        
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333; 
+            min-height: 100vh;
+        }
+
+        .navbar { 
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
+            color: white; 
+            padding: 1.2rem 3rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .container { 
+            max-width: 1400px; 
+            margin: 2rem auto; 
+            padding: 0 2rem; 
+        }
+
+        .welcome { 
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+            backdrop-filter: blur(10px);
+            padding: 3rem; 
+            border-radius: var(--radius); 
+            margin-bottom: 2rem; 
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(52, 152, 219, 0.1)"/></svg>') no-repeat;
+            background-size: contain;
+        }
+
+        .welcome h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .welcome h2::after {
+            content: '👋';
+            font-size: 2rem;
+        }
+
+        .welcome p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 2rem; 
+            margin-bottom: 3rem; 
+        }
+
+        .stat-card { 
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem 2rem; 
+            border-radius: var(--radius); 
+            text-align: center; 
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, var(--success), var(--success-dark));
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, var(--warning), #e67e22);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: linear-gradient(135deg, var(--info), #138496);
+        }
+
+        .stat-card h3 {
+            color: var(--gray);
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .btn { 
+            padding: 1rem 2rem; 
+            margin: 0.5rem; 
+            text-decoration: none; 
+            border-radius: 10px; 
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: none; 
+            cursor: pointer; 
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; 
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success { 
+            background: linear-gradient(135deg, var(--success), var(--success-dark));
+            color: white; 
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-danger { 
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            color: white; 
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info), #138496);
+            color: white;
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
+        }
+
+        .btn-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(23, 162, 184, 0.4);
+        }
+
+        .alert { 
+            padding: 1.5rem; 
+            border-radius: var(--radius); 
+            margin-bottom: 2rem; 
+            box-shadow: var(--shadow);
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-success { 
+            background: rgba(212, 237, 218, 0.9); 
+            color: #155724; 
+            border-left-color: var(--success);
+        }
+
+        .alert-error { 
+            background: rgba(248, 215, 218, 0.9); 
+            color: #721c24; 
+            border-left-color: var(--danger);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .action-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .action-card:nth-child(2) .action-icon {
+            background: linear-gradient(135deg, var(--success), var(--success-dark));
+        }
+
+        .action-card:nth-child(3) .action-icon {
+            background: linear-gradient(135deg, var(--warning), #e67e22);
+        }
+
+        .action-card:nth-child(4) .action-icon {
+            background: linear-gradient(135deg, var(--info), #138496);
+        }
+
+        .action-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .action-desc {
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .admin-image {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .admin-image img {
+            max-width: 400px;
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .quick-stat {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .quick-stat i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .quick-stat .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-stat .label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .welcome {
+                padding: 2rem;
+                text-align: center;
+            }
+
+            .welcome h2 {
+                font-size: 2rem;
+                justify-content: center;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                margin: 0.25rem 0;
+            }
+        }
+
+        /* Animation for stats */
+        @keyframes countUp {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .stat-value {
+            animation: countUp 0.8s ease-out;
+        }
+    </style>
+</head>
 <body>
-<h2>Admin Dashboard</h2>
-<ul>
-    <li><a href="/admin/hotels">Manage Hotels</a></li>
-    <li><a href="/admin/bookings">View Bookings</a></li>
-    <li><a href="/admin/users">View Users</a></li>
-</ul>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-hotel"></i>
+            <h1>HotelBooking - Admin Panel</h1>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar" th:text="${username.substring(0, 1).toUpperCase()}">A</div>
+            <div>
+                <div style="font-weight: 600;">Welcome, <span th:text="${username}">Admin</span></div>
+                <div style="font-size: 0.8rem; opacity: 0.8;">Administrator</div>
+            </div>
+            <a href="/logout" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Success/Error Messages -->
+        <div th:if="${param.success}" class="alert alert-success">
+            <i class="fas fa-check-circle fa-2x"></i>
+            <div>
+                <strong>Success!</strong>
+                <div th:text="${param.success}"></div>
+            </div>
+        </div>
+        <div th:if="${param.error}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle fa-2x"></i>
+            <div>
+                <strong>Error!</strong>
+                <div th:text="${param.error}"></div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome">
+            <h2>Welcome to Admin Dashboard!</h2>
+            <p>Manage your hotel booking system efficiently with real-time analytics and powerful management tools.</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <i class="fas fa-chart-line"></i>
+                <div class="value" th:text="${totalHotels}">0</div>
+                <div class="label">Total Hotels</div>
+            </div>
+            <div class="quick-stat">
+                <i class="fas fa-calendar-check"></i>
+                <div class="value" th:text="${totalBookings}">0</div>
+                <div class="label">Total Bookings</div>
+            </div>
+            <div class="quick-stat">
+                <i class="fas fa-users"></i>
+                <div class="value" th:text="${totalUsers}">0</div>
+                <div class="label">Total Users</div>
+            </div>
+            <div class="quick-stat">
+                <i class="fas fa-dollar-sign"></i>
+                <div class="value">$<span th:text="${totalRevenue}">0</span></div>
+                <div class="label">Total Revenue</div>
+            </div>
+        </div>
+
+        <!-- Main Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <h3>Hotels Management</h3>
+                <div class="stat-value" th:text="${totalHotels}">12</div>
+                <div class="stat-change">+2 this month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Bookings</h3>
+                <div class="stat-value" th:text="${totalBookings}">156</div>
+                <div class="stat-change">+15% this month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Users</h3>
+                <div class="stat-value" th:text="${totalUsers}">89</div>
+                <div class="stat-change">+8 new users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3>Revenue</h3>
+                <div class="stat-value">$<span th:text="${totalRevenue}">12,450</span></div>
+                <div class="stat-change">+22% growth</div>
+            </div>
+        </div>
+
+        <!-- Admin Illustration -->
+        <div class="admin-image">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%233498db' opacity='0.1'/%3E%3Ccircle cx='200' cy='150' r='80' fill='%233498db' opacity='0.2'/%3E%3Cpath d='M200 70 Q250 150 200 230 Q150 150 200 70' fill='%233498db' opacity='0.3'/%3E%3Ccircle cx='200' cy='120' r='20' fill='%233498db' opacity='0.5'/%3E%3C/svg%3E" 
+                 alt="Admin Dashboard Illustration">
+        </div>
+
+        <!-- Action Cards -->
+        <div class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <div class="action-title">Manage Hotels</div>
+                <div class="action-desc">Add, edit, or remove hotels from your system. Update pricing, amenities, and availability.</div>
+                <a href="/admin/hotels" class="btn btn-primary">
+                    <i class="fas fa-cog"></i> Manage Hotels
+                </a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="action-title">Manage Bookings</div>
+                <div class="action-desc">View all bookings, check availability, and manage reservations across all hotels.</div>
+                <a href="/admin/bookings" class="btn btn-success">
+                    <i class="fas fa-list"></i> View Bookings
+                </a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="action-title">Manage Users</div>
+                <div class="action-desc">Manage user accounts, permissions, and access levels for your booking system.</div>
+                <a href="/admin/users" class="btn btn-info">
+                    <i class="fas fa-user-cog"></i> User Management
+                </a>
+            </div>
+            <div class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="action-title">Analytics & Reports</div>
+                <div class="action-desc">View detailed analytics, generate reports, and track business performance.</div>
+                <a href="/admin/analytics" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> View Analytics
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="text-align: center; margin: 3rem 0;">
+            <a href="/admin/test-data" class="btn btn-success">
+                <i class="fas fa-database"></i> Add Test Data
+            </a>
+            <a href="/dashboard" class="btn btn-info">
+                <i class="fas fa-eye"></i> Switch to User View
+            </a>
+            <a href="/admin/settings" class="btn btn-primary">
+                <i class="fas fa-cogs"></i> System Settings
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Simple animation for stats
+        document.addEventListener('DOMContentLoaded', function() {
+            const stats = document.querySelectorAll('.stat-value');
+            stats.forEach(stat => {
+                const finalValue = stat.textContent;
+                stat.textContent = '0';
+                
+                let current = 0;
+                const increment = finalValue / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= finalValue) {
+                        stat.textContent = finalValue;
+                        clearInterval(timer);
+                    } else {
+                        stat.textContent = Math.floor(current);
+                    }
+                }, 50);
+            });
+        });
+    </script>
 </body>
 </html>
