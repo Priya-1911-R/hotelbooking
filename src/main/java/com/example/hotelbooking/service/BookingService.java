@@ -12,6 +12,7 @@ import com.example.hotelbooking.model.BookingStatus;
 import com.example.hotelbooking.repository.BookingRepository;
 
 @Service
+@SuppressWarnings("NonnullTypeParameter")
 public class BookingService {
 
     private final BookingRepository bookingRepository;
